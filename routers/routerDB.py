@@ -1,24 +1,16 @@
-import sqlite3
 import json
-import ast
+import sqlite3
 
-connection = sqlite3.connect('routers.db')
-mycursor = connection.cursor()
-
-with open('answers.json') as f:
-    data = json.load(f)
-
-data = ast.literal_eval(json.dumps(data))
-
-dataList = [data]
-
-mycursor.execute(
-    "CREATE TABLE IF NOT EXISTS answers(words text)")
-
-#mycursor.executemany("INSERT INTO answers(words) VALUES (?)", (dataList))
-
-print("Command executed sucesssfully...")
-connection.commit()
+answers = open('answers.json')
+words = json.load(answers)
+words = [(x,) for x in words]
 
 
-connection.close()
+db = sqlite3.connect("db")
+cursor = db.cursor()
+cursor.execute('''CREATE TABLE IF NOT EXISTS answers(word TEXT)''')
+query = '''INSERT INTO answers (word) VALUES (?);'''
+cursor.executemany(query, words)
+db.commit()
+print(cursor.rowcount)
+db.close()
