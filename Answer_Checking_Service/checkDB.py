@@ -6,7 +6,7 @@ words = json.load(answers)
 words = [(x,) for x in words]
 
 
-db = sqlite3.connect("checkdb")
+db = sqlite3.connect("checkDB")
 cursor = db.cursor()
 cursor.execute(
     '''CREATE TABLE IF NOT EXISTS dailyWord( id INTEGER PRIMARY KEY AUTOINCREMENT, word TEXT)''')
