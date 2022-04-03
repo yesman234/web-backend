@@ -1,6 +1,6 @@
+"""
 import json
 import sqlite3
-
 answers = open('answers.json')
 words = json.load(answers)
 words = [(x,) for x in words]
@@ -17,3 +17,4 @@ cursor.executemany(query, words)
 db.commit()
 print(cursor.rowcount)
 db.close()
+"""
