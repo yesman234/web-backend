@@ -1,3 +1,5 @@
+from email.policy import HTTP
+from http import HTTPStatus
 from fastapi import FastAPI, Depends
 from pydantic import BaseModel
 import contextlib
@@ -8,7 +10,7 @@ app = FastAPI()
 
 WORDLE_WORD_LENGTH = 5
 
-class Guess(BaseModel):
+class Word(BaseModel):
     word: str
 
 def get_db():
@@ -17,13 +19,25 @@ def get_db():
         yield db
 
 @app.post("/WordValidations")
-def validate_word(guess: Guess,  db: sqlite3.Connection = Depends(get_db)):
+def validate_word(guess: Word,  db: sqlite3.Connection = Depends(get_db)):
     cur = db.execute(
         """
         SELECT word FROM gameDictionary WHERE word = (?);
         """
-        , (guess.word, )
+        , (guess.word.lower(), )
     )
     word_found = cur.fetchall()
 
     return { "word_valid": True } if word_found else { "word_valid": False }
+
+@app.post("/WordValidations/AddWord")
+def add_word(new_word: Word, db: sqlite3.Connection = Depends(get_db)):
+    db.execute(
+        """
+        INSERT INTO gameDictionary (word) VALUES (?);
+        """
+        , (new_word.word.lower(), )
+    )
+    db.commit()
+
+    return HTTPStatus.OK
