@@ -1,4 +1,3 @@
-from email.policy import HTTP
 from http import HTTPStatus
 from fastapi import FastAPI, Depends
 from pydantic import BaseModel
