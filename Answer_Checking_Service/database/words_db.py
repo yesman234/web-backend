@@ -13,14 +13,15 @@ def read_json_from_file(path: str):
 class WordsDB:
     def __init__(self):
         print('Loading Word Database')
-        self.connection = sqlite3.connect('database/words.db') 
+        self.connection = sqlite3.connect('database/words.db')
         self.cursor = self.connection.cursor()
 
         # load words from the file
         words = read_json_from_file('static/answers.json')
 
         # create a (word, date) record for every word
-        now = datetime.now()
+        timestamp = datetime.now()
+        now = datetime(timestamp.year, timestamp.month, timestamp.day)
         words = [(word, now + timedelta(days=i)) for i, word in enumerate(words)]
 
         # populate table
@@ -38,18 +39,18 @@ class WordsDB:
     def __del__(self):
         self.connection.close()
     
-    def create():
+    def select_by_word(self, word: str):
+        return self.cursor.execute('''SELECT rowid, * FROM words WHERE word = ?''', (word,)).fetchall()
+
+    def select_by_timestamp(self, timestamp: datetime):
+        return self.cursor.execute('''SELECT rowid, * FROM words WHERE date = ?''', (timestamp,)).fetchall()
+
+    def update_by_timestamp(self, timestamp: datetime):
         print('...')
         self.connection.commit()
 
-    def read():
-        print('...')
-
-    def update():
+    def update_by_rowid(self, rowid: int):
         print('...')
         self.connection.commit()
 
-    def delete():
-        print('...')
-        self.connection.commit()
 
