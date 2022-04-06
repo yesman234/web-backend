@@ -45,9 +45,8 @@ class WordsDB:
     def select_by_timestamp(self, timestamp: datetime):
         return self.cursor.execute('''SELECT rowid, * FROM words WHERE date = ?''', (timestamp,)).fetchall()
 
-    def update_by_timestamp(self, timestamp: datetime):
-        print('...')
-        self.connection.commit()
+    def update_by_timestamp(self, word: str, timestamp: datetime):
+        return self.cursor.execute('''UPDATE words SET word = ? WHERE date = ?''', (word, timestamp))
 
     def update_by_rowid(self, rowid: int):
         print('...')
