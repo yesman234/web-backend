@@ -37,7 +37,7 @@ def change_answer(change: Word, status_code=status.HTTP_200_OK):
     if not current:
         raise HTTPException(status_code=404, detail="Word not found")
     
-    print(change.word.lower())
+    #print(change.word.lower())
     if change.word.lower() == current or len(change.word) != 5:
         raise HTTPException(status_code=400, detail="Word not match parameters")
     else:
