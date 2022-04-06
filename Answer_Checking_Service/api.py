@@ -37,9 +37,11 @@ def change_answer(change: Word, status_code=status.HTTP_200_OK):
     if not current:
         raise HTTPException(status_code=404, detail="Word not found")
     
-    if change.word == current:
-        raise HTTPException(status_code=400, detail="There seems to be a problem. Please try again later.")
+    print(change.word.lower())
+    if change.word.lower() == current or len(change.word) != 5:
+        raise HTTPException(status_code=400, detail="Word not match parameters")
     else:
         words_db.update_by_timestamp(change.word.lower(), ts)
+        new = words_db.select_by_timestamp(ts)
         
-    return status_code
+    return {"status": status_code, "changed_word": new}
