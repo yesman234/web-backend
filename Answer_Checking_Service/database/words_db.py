@@ -13,7 +13,7 @@ def read_json_from_file(path: str):
 class WordsDB:
     def __init__(self):
         print('Loading Word Database')
-        self.connection = sqlite3.connect('database/words.db')
+        self.connection = sqlite3.connect('database/words.db', check_same_thread=False)
         self.cursor = self.connection.cursor()
 
         # load words from the file
@@ -45,12 +45,5 @@ class WordsDB:
     def select_by_timestamp(self, timestamp: datetime):
         return self.cursor.execute('''SELECT rowid, * FROM words WHERE date = ?''', (timestamp,)).fetchall()
 
-    def update_by_timestamp(self, timestamp: datetime):
-        print('...')
-        self.connection.commit()
-
-    def update_by_rowid(self, rowid: int):
-        print('...')
-        self.connection.commit()
-
-
+    def update_by_timestamp(self, word: str, timestamp: datetime):
+        self.cursor.execute('''UPDATE words SET word = ? WHERE date = ?''', (word, timestamp))
