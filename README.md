@@ -5,7 +5,7 @@
 Dan Lungaro
 Charles Chung cc506@csu.fullerton.edu
 Amman-Kabier Sandhu
-Johnathan Carranza
+Johnathan Carranza johnathancarranza@csu.fullerton.edu
 
 # How to initialize the program
 
