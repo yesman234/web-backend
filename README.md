@@ -2,7 +2,7 @@
 
 # Members
 
-Dan Lungaro
+Dan Lungaro dlungaro@csu.fullerton.edu
 Charles Chung cc506@csu.fullerton.edu
 Amman-Kabier Sandhu
 Johnathan Carranza johnathancarranza@csu.fullerton.edu
