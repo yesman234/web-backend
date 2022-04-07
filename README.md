@@ -3,7 +3,7 @@
 # Members
 
 Dan Lungaro
-Charles Chung
+Charles Chung cc506@csu.fullerton.edu
 Amman-Kabier Sandhu
 Johnathan Carranza
 
@@ -11,7 +11,7 @@ Johnathan Carranza
 
 First open the terminal
 Next, ensure you are in the correct directory the folder should be called 'web-backend'
-Then, you must run the command 'bash startup.sh'
+Then, you must run the command `bash startup.sh`
 
 # What does this script do?
 
