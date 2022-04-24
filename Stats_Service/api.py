@@ -31,7 +31,7 @@ def get_statistics(user_id: int):
 
 
 # Retrieving the top 10 users by longest streak
-@app.get("/top10streak/{user_id}")
-def get_statistics(user_id: int):
+@app.get("/top10streak")
+def get_statistics():
     pass
 
