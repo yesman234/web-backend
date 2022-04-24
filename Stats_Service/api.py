@@ -26,12 +26,12 @@ def get_statistics(user_id: int):
 
 # Retrieving the top 10 users by number of wins
 @app.get("/top10wins/{user_id}")
-def get_statistics(user_id: int):
+def get_top_10_users_by_wins(user_id: int):
     pass
 
 
 # Retrieving the top 10 users by longest streak
 @app.get("/top10streak")
-def get_statistics():
+def get_top_10_users_by_longest_streak():
     pass
 
