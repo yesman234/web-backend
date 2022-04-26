@@ -25,11 +25,12 @@ for db_num in range(total_databases):
             try:
                 username = str(fake.simple_profile()['username'])
                 user_id = str(uuid.uuid4())
+                cur_user_ids.append(user_id)
                 db.execute('INSERT INTO users(user_id, username) VALUES(?, ?)', [
                            user_id, username])
-                cur_user_ids.append(user_id)
 
             except sqlite3.IntegrityError:
+                cur_user_ids.remove(user_id)
                 continue
         db.commit()
         print("Finished Users table")
