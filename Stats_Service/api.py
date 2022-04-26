@@ -35,9 +35,9 @@ def get_statistics(user_id: str, db: sqlite3.Connection = Depends(get_db)):
     cur = db.execute(
         """
         SELECT game_id, finished, guesses, won FROM games WHERE user_id = (?);
-        """
-    )
+        """, ([user_id]))
     stats = cur.fetchall()
+    print(user_id)
     return {"Stats": stats}
 
 # Retrieving the top 10 users by number of wins
