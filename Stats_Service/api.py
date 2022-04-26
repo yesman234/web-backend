@@ -31,13 +31,19 @@ def add_game(user: User, game: Game):
 
 # Retrieving the statistics for a user.
 @app.get("/games/{user_id}")
-def get_statistics(user_id: int):
-    pass
+def get_statistics(user_id: int, db: sqlite3.Connection = Depends(get_db)):
+    cur = db.execute(
+        """
+        SELECT game_id, finished, guesses, won FROM games WHERE user_id = (?);
+        """
+    )
+    stats = cur
+    return {"Stats": stats}
 
 # Retrieving the top 10 users by number of wins
 
 
-@app.get("/top10wins/")
+@app.get("/top10wins")
 def get_top_10_users_by_wins(db: sqlite3.Connection = Depends(get_db)):
     cur = db.execute(
         """
