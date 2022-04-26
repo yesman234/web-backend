@@ -25,7 +25,8 @@ for db_num in range(total_databases):
                 username = str(fake.simple_profile()['username'])
                 user_id = str(uuid.uuid4())
                 cur_user_ids.append(user_id)
-                db.execute('INSERT INTO users(user_id, username) VALUES(?, ?)', [user_id, username])
+                db.execute('INSERT INTO users(user_id, username) VALUES(?, ?)', [
+                           user_id, username])
 
             except sqlite3.IntegrityError:
                 continue
@@ -36,9 +37,11 @@ for db_num in range(total_databases):
         num_days = (today - jan_1).days
         for _ in range(NUM_STATS):
             try:
-                user_id = cur_user_ids[random.randint(0, len(cur_user_ids) - 1)]
+                user_id = cur_user_ids[random.randint(
+                    0, len(cur_user_ids) - 1)]
                 game_id = random.randint(1, num_days)
-                finished = jan_1 + datetime.timedelta(random.randint(0, num_days))
+                finished = jan_1 + \
+                    datetime.timedelta(random.randint(0, num_days))
                 # N.B. real game scores aren't uniformly distributed...
                 guesses = random.randint(1, 6)
                 # ... and people mostly play to win
