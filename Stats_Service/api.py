@@ -1,6 +1,6 @@
 import sqlite3
 from fastapi import FastAPI, Depends
-from models import User, Game
+from Stats_Service.models import User, Game
 import contextlib
 import uuid
 
@@ -31,13 +31,13 @@ def add_game(user: User, game: Game):
 
 # Retrieving the statistics for a user.
 @app.get("/games/{user_id}")
-def get_statistics(user_id: int, db: sqlite3.Connection = Depends(get_db)):
+def get_statistics(user_id: str, db: sqlite3.Connection = Depends(get_db)):
     cur = db.execute(
         """
         SELECT game_id, finished, guesses, won FROM games WHERE user_id = (?);
         """
     )
-    stats = cur
+    stats = cur.fetchall()
     return {"Stats": stats}
 
 # Retrieving the top 10 users by number of wins
@@ -50,7 +50,7 @@ def get_top_10_users_by_wins(db: sqlite3.Connection = Depends(get_db)):
         SELECT * FROM wins LIMIT 10;
         """
     )
-    wins = cur
+    wins = cur.fetchall()
     return {"Top 10 Wins": wins}
 
 
@@ -62,5 +62,5 @@ def get_top_10_users_by_longest_streak(db: sqlite3.Connection = Depends(get_db))
         SELECT * FROM streaks LIMIT 10;
         """
     )
-    streaks = cur
+    streaks = cur.fetchall()
     return {"Top 10 Streaks": streaks}
