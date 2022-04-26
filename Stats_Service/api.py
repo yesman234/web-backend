@@ -1,12 +1,12 @@
-import sqlite3
+from http import HTTPStatus
 from fastapi import FastAPI, Depends
-from Stats_Service.models import User, Game
+from Stats_Service.models import Streak, User, Game, Wins
+import sqlite3
 import contextlib
 import uuid
 
 app = FastAPI()
 
-# Posting a win or loss for a particular game, along with a timestamp and number of guesses.
 
 
 def get_db():
@@ -14,19 +14,40 @@ def get_db():
         db.row_factory = sqlite3.Row
         yield db
 
-
+# Posting a win or loss for a particular game, along with a timestamp and number of guesses.
 @app.post("/games")
-def add_game(user: User, game: Game):
+def add_game(user: User, game: Game, s: Streak, w: Wins, db: sqlite3.Connection = Depends(get_db)):
     shard_key = user.user_id % 3
     if shard_key == 0:
-        # INSERT INTO games_shard_0(user_id, game_id, finished, guesses, won)  VALUES(?, ?, ?, ?, ?)
-        pass
+        db.execute(
+            """
+            INSERT INTO games (user_id, game_id, finished, guesses, won) VALUES (?, ?, ?, ?, ?);
+            """, ([game.user_id], [game.game_id], game.finished, game.guesses, game.won, )
+        )
+        db.commit()
+        
+        return HTTPStatus.OK
+        
     elif shard_key == 1:
-        # INSERT INTO games_shard_1(user_id, game_id, finished, guesses, won)  VALUES(?, ?, ?, ?, ?)
+        # db.execute(
+        #     """
+        #     INSERT INTO wins (user_id, COUNT(won)) VALUES (?, ?);
+        #     """, ([w.user_id], [w.wins], )
+        # )
+        # db.commit()
+        
+        # return HTTPStatus.OK
         pass
+    
     elif shard_key == 2:
-        # INSERT INTO games_shard_2(user_id, game_id, finished, guesses, won)  VALUES(?, ?, ?, ?, ?)
-        pass
+        db.execute(
+            """
+            INSERT INTO streaks (user_id, streak, beginning, ending) VALUES (?, ?, ?, ?);
+            """, ([s.user_id], [s.streak], s.finished, s.guesses, )
+        )
+        db.commit()
+        
+        return HTTPStatus.OK
 
 
 # Retrieving the statistics for a user.
