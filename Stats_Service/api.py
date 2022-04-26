@@ -51,7 +51,7 @@ def get_top_10_users_by_wins(db: sqlite3.Connection = Depends(get_db)):
         """
     )
     wins = cur.fetchall()
-    return {"Top 10 Wins": wins}
+    return {"Top_10_Wins": wins}
 
 
 # Retrieving the top 10 users by longest streak
@@ -63,4 +63,4 @@ def get_top_10_users_by_longest_streak(db: sqlite3.Connection = Depends(get_db))
         """
     )
     streaks = cur.fetchall()
-    return {"Top 10 Streaks": streaks}
+    return {"Top_10_Streaks": streaks}
