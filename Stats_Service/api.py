@@ -37,7 +37,7 @@ def get_statistics(user_id: int):
 # Retrieving the top 10 users by number of wins
 
 
-@app.get("/top10wins/{user_id}")
+@app.get("/top10wins/")
 def get_top_10_users_by_wins(db: sqlite3.Connection = Depends(get_db)):
     cur = db.execute(
         """
@@ -45,7 +45,7 @@ def get_top_10_users_by_wins(db: sqlite3.Connection = Depends(get_db)):
         """
     )
     wins = cur
-    return {wins}
+    return {"Top 10 Wins": wins}
 
 
 # Retrieving the top 10 users by longest streak
@@ -57,4 +57,4 @@ def get_top_10_users_by_longest_streak(db: sqlite3.Connection = Depends(get_db))
         """
     )
     streaks = cur
-    return {streaks}
+    return {"Top 10 Streaks": streaks}
