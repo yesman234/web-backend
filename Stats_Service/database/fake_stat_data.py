@@ -17,6 +17,7 @@ random.seed(YEAR)
 fake = faker.Faker()
 faker.Faker.seed(YEAR)
 cur_user_ids = []
+print("Beginning to insert fake stat data...")
 for db_num in range(total_databases):
     cur_db = stat_db_name + str(db_num) + db_file_extension
     with contextlib.closing(sqlite3.connect(cur_db)) as db:
@@ -31,7 +32,7 @@ for db_num in range(total_databases):
             except sqlite3.IntegrityError:
                 continue
         db.commit()
-        print("Finish Users table")
+        print("Finished Users table")
         jan_1 = datetime.date(YEAR, 1, 1)
         today = datetime.date.today()
         num_days = (today - jan_1).days
@@ -56,5 +57,5 @@ for db_num in range(total_databases):
             except sqlite3.IntegrityError:
                 continue
         db.commit()
-        print("Finish Games table")
+        print("Finished Games table")
         cur_user_ids.clear()
