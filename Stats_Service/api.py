@@ -1,6 +1,6 @@
 from http import HTTPStatus
 from fastapi import FastAPI, Depends
-from Stats_Service.models import Streak, User, Game, Wins
+from Stats_Service.models import User, Game
 import sqlite3
 import contextlib
 import uuid
@@ -13,39 +13,51 @@ def get_db():
     with contextlib.closing(sqlite3.connect("StatDB_0.db")) as db:
         db.row_factory = sqlite3.Row
         yield db
+def get_db1():
+    with contextlib.closing(sqlite3.connect("StatDB_1.db")) as db1:
+        db1.row_factory = sqlite3.Row
+        yield db1
+def get_db2():
+    with contextlib.closing(sqlite3.connect("StatDB_2.db")) as db2:
+        db2.row_factory = sqlite3.Row
+        yield db2
 
 # Posting a win or loss for a particular game, along with a timestamp and number of guesses.
 @app.post("/games")
-def add_game(user: User, game: Game, s: Streak, w: Wins, db: sqlite3.Connection = Depends(get_db)):
-    shard_key = user.user_id % 3
+def add_game(game: Game, db: sqlite3.Connection = Depends(get_db), 
+             db1: sqlite3.Connection = Depends(get_db1), db2: sqlite3.Connection = Depends(get_db2)):
+    shard_key = int(uuid.UUID(game.user_id)) % (3)
+    print(shard_key)
     if shard_key == 0:
+        print(shard_key)
+        print(type(game.user_id))
+        print(game.user_id)
         db.execute(
             """
             INSERT INTO games (user_id, game_id, finished, guesses, won) VALUES (?, ?, ?, ?, ?);
-            """, ([game.user_id], [game.game_id], game.finished, game.guesses, game.won, )
+            """, (game.user_id, game.game_id, game.finished, game.guesses, game.won, )
         )
         db.commit()
         
         return HTTPStatus.OK
         
     elif shard_key == 1:
-        # db.execute(
-        #     """
-        #     INSERT INTO wins (user_id, COUNT(won)) VALUES (?, ?);
-        #     """, ([w.user_id], [w.wins], )
-        # )
-        # db.commit()
+        db1.execute(
+            """
+            INSERT INTO games (user_id, game_id, finished, guesses, won) VALUES (?, ?, ?, ?, ?);
+            """, ([game.user_id], [game.game_id], game.finished, game.guesses, game.won, )
+        )
+        db1.commit()
         
-        # return HTTPStatus.OK
-        pass
+        return HTTPStatus.OK
     
     elif shard_key == 2:
-        db.execute(
+        db2.execute(
             """
-            INSERT INTO streaks (user_id, streak, beginning, ending) VALUES (?, ?, ?, ?);
-            """, ([s.user_id], [s.streak], s.finished, s.guesses, )
+            INSERT INTO games (user_id, game_id, finished, guesses, won) VALUES (?, ?, ?, ?, ?);
+            """, ([game.user_id], [game.game_id], game.finished, game.guesses, game.won, )
         )
-        db.commit()
+        db2.commit()
         
         return HTTPStatus.OK
 
@@ -53,13 +65,15 @@ def add_game(user: User, game: Game, s: Streak, w: Wins, db: sqlite3.Connection 
 # Retrieving the statistics for a user.
 @app.get("/games/{user_id}")
 def get_statistics(user_id: str, db: sqlite3.Connection = Depends(get_db)):
-    cur = db.execute(
-        """
-        SELECT game_id, finished, guesses, won FROM games WHERE user_id = (?);
-        """, ([user_id]))
-    stats = cur.fetchall()
-    print(user_id)
-    return {"Stats": stats}
+    shard_key = user_id.format(3)
+    if shard_key == 0:
+        cur = db.execute(
+            """
+            SELECT game_id, finished, guesses, won FROM games WHERE user_id = (?);
+            """, ([user_id]))
+        stats = cur.fetchall()
+        print(user_id)
+        return {"Stats": stats}
 
 # Retrieving the top 10 users by number of wins
 
