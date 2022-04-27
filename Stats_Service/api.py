@@ -27,11 +27,11 @@ def get_db2():
 def add_game(game: Game, db: sqlite3.Connection = Depends(get_db), 
              db1: sqlite3.Connection = Depends(get_db1), db2: sqlite3.Connection = Depends(get_db2)):
     shard_key = int(uuid.UUID(game.user_id)) % (3)
-    print(shard_key)
+    #print(shard_key)
     if shard_key == 0:
-        print(shard_key)
-        print(type(game.user_id))
-        print(game.user_id)
+        #print(shard_key)
+        #print(type(game.user_id))
+        #print(game.user_id)
         db.execute(
             """
             INSERT INTO games (user_id, game_id, finished, guesses, won) VALUES (?, ?, ?, ?, ?);
@@ -64,20 +64,37 @@ def add_game(game: Game, db: sqlite3.Connection = Depends(get_db),
 
 # Retrieving the statistics for a user.
 @app.get("/games/{user_id}")
-def get_statistics(user_id: str, db: sqlite3.Connection = Depends(get_db)):
-    shard_key = user_id.format(3)
+def get_statistics(user_id: str, db: sqlite3.Connection = Depends(get_db), 
+                   db1: sqlite3.Connection = Depends(get_db1), db2: sqlite3.Connection = Depends(get_db2)):
+    shard_key = int(uuid.UUID(user_id)) % (3)
     if shard_key == 0:
         cur = db.execute(
             """
             SELECT game_id, finished, guesses, won FROM games WHERE user_id = (?);
             """, ([user_id]))
         stats = cur.fetchall()
-        print(user_id)
+        
+        return {"Stats": stats}
+    
+    elif shard_key == 1:
+        cur = db1.execute(
+            """
+            SELECT game_id, finished, guesses, won FROM games WHERE user_id = (?);
+            """, ([user_id]))
+        stats = cur.fetchall()
+        
+        return {"Stats": stats}
+    
+    elif shard_key == 2:
+        cur = db2.execute(
+            """
+            SELECT game_id, finished, guesses, won FROM games WHERE user_id = (?);
+            """, ([user_id]))
+        stats = cur.fetchall()
+        
         return {"Stats": stats}
 
 # Retrieving the top 10 users by number of wins
-
-
 @app.get("/top10wins")
 def get_top_10_users_by_wins(db: sqlite3.Connection = Depends(get_db)):
     cur = db.execute(
