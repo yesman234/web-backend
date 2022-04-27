@@ -45,7 +45,7 @@ def add_game(game: Game, db: sqlite3.Connection = Depends(get_db),
         db1.execute(
             """
             INSERT INTO games (user_id, game_id, finished, guesses, won) VALUES (?, ?, ?, ?, ?);
-            """, ([game.user_id], [game.game_id], game.finished, game.guesses, game.won, )
+            """, (game.user_id, game.game_id, game.finished, game.guesses, game.won, )
         )
         db1.commit()
         
@@ -55,7 +55,7 @@ def add_game(game: Game, db: sqlite3.Connection = Depends(get_db),
         db2.execute(
             """
             INSERT INTO games (user_id, game_id, finished, guesses, won) VALUES (?, ?, ?, ?, ?);
-            """, ([game.user_id], [game.game_id], game.finished, game.guesses, game.won, )
+            """, (game.user_id, game.game_id, game.finished, game.guesses, game.won, )
         )
         db2.commit()
         
