@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 class Game(BaseModel):
-    user_id: int
+    user_id: str
     game_id: int
     finished: datetime
     guesses: int
@@ -11,5 +11,5 @@ class Game(BaseModel):
 
 
 class User(BaseModel):
-    user_id: int
+    user_id: str
     username: str
