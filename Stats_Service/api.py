@@ -29,9 +29,6 @@ def add_game(game: Game, db: sqlite3.Connection = Depends(get_db),
     shard_key = int(uuid.UUID(game.user_id)) % (3)
     #print(shard_key)
     if shard_key == 0:
-        #print(shard_key)
-        #print(type(game.user_id))
-        #print(game.user_id)
         db.execute(
             """
             INSERT INTO games (user_id, game_id, finished, guesses, won) VALUES (?, ?, ?, ?, ?);
@@ -96,23 +93,83 @@ def get_statistics(user_id: str, db: sqlite3.Connection = Depends(get_db),
 
 # Retrieving the top 10 users by number of wins
 @app.get("/top10wins")
-def get_top_10_users_by_wins(db: sqlite3.Connection = Depends(get_db)):
+def get_top_10_users_by_wins(db: sqlite3.Connection = Depends(get_db),
+                db1: sqlite3.Connection = Depends(get_db1), db2: sqlite3.Connection = Depends(get_db2)):
+    win_agg = []
     cur = db.execute(
         """
         SELECT * FROM wins LIMIT 10;
         """
     )
     wins = cur.fetchall()
-    return {"Top_10_Wins": wins}
+    for win in wins:
+        win_agg.append(win)
+    wins.clear()
+
+    cur = db1.execute(
+        """
+        SELECT * FROM wins LIMIT 10;
+        """
+    )
+    wins = cur.fetchall()
+    for win in wins:
+        win_agg.append(win)
+    wins.clear()
+
+    cur = db2.execute(
+        """
+        SELECT * FROM wins LIMIT 10;
+        """
+    )
+    wins = cur.fetchall()
+    for win in wins:
+        win_agg.append(win)
+    wins.clear()
+
+    def sort_wins(row):
+        return row["COUNT(won)"]
+    
+    win_agg.sort(reverse=True ,key=sort_wins)
+    return {"Top_10_Wins": win_agg[0:10]}
 
 
 # Retrieving the top 10 users by longest streak
 @ app.get("/top10streak")
-def get_top_10_users_by_longest_streak(db: sqlite3.Connection = Depends(get_db)):
+def get_top_10_users_by_longest_streak(db: sqlite3.Connection = Depends(get_db),
+            db1: sqlite3.Connection = Depends(get_db1), db2: sqlite3.Connection = Depends(get_db2)):
+    streak_agg = []
     cur = db.execute(
         """
         SELECT * FROM streaks LIMIT 10;
         """
     )
-    streaks = cur.fetchall()
-    return {"Top_10_Streaks": streaks}
+    wins = cur.fetchall()
+    for win in wins:
+        streak_agg.append(win)
+    wins.clear()
+
+    cur = db1.execute(
+        """
+        SELECT * FROM streaks LIMIT 10;
+        """
+    )
+    wins = cur.fetchall()
+    for win in wins:
+        streak_agg.append(win)
+    wins.clear()
+
+    cur = db2.execute(
+        """
+        SELECT * FROM streaks LIMIT 10;
+        """
+    )
+    wins = cur.fetchall()
+    for win in wins:
+        streak_agg.append(win)
+    wins.clear()
+
+    def sort_streak(row):
+        return row["streak"]
+    
+    streak_agg.sort(reverse=True, key=sort_streak)
+    return {"Top_10_Streaks": streak_agg[0:10]}
