@@ -20,5 +20,7 @@ This sh script will initalize the databases for each of the microservices as wel
 # Endpoints
 
 http://localhost:9999/api/v1/docs
+
 http://localhost:9999/api/v2/docs
+
 http://localhost:9999/api/v3/docs
