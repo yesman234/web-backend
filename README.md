@@ -4,7 +4,7 @@
 
 Dan Lungaro dlungaro@csu.fullerton.edu
 Charles Chung cc506@csu.fullerton.edu
-Amman-Kabier Sandhu
+Amman-Kabier Sandhu ammsandhu@csu.fullerton.edu
 Johnathan Carranza johnathancarranza@csu.fullerton.edu
 
 # How to initialize the program
@@ -16,3 +16,9 @@ Then, you must run the command `bash startup.sh`
 # What does this script do?
 
 This sh script will initalize the databases for each of the microservices as well as use foreman to startup the web server.
+
+# Endpoints
+
+http://localhost:9999/api/v1/docs
+http://localhost:9999/api/v2/docs
+http://localhost:9999/api/v3/docs
