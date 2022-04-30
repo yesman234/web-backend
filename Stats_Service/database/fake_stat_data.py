@@ -9,8 +9,9 @@ from db_constants import total_databases, stat_db_name, db_file_extension
 
 import faker
 
-NUM_STATS = 1_000
-NUM_USERS = 100
+
+NUM_STATS = 1_000_000
+NUM_USERS = 100_000
 YEAR = 2022
 
 random.seed(YEAR)
