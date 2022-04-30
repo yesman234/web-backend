@@ -63,33 +63,79 @@ def add_game(game: Game, db: sqlite3.Connection = Depends(get_db),
 @app.get("/games/{user_id}")
 def get_statistics(user_id: str, db: sqlite3.Connection = Depends(get_db), 
                    db1: sqlite3.Connection = Depends(get_db1), db2: sqlite3.Connection = Depends(get_db2)):
-    shard_key = int(uuid.UUID(user_id)) % (3)
+    shard_key = int(uuid.UUID(user_id)) % (3)  
     if shard_key == 0:
         cur = db.execute(
             """
             SELECT game_id, finished, guesses, won FROM games WHERE user_id = (?);
-            """, ([user_id]))
+            """,
+            ([user_id]))
         stats = cur.fetchall()
+        print(stats)
         
-        return {"Stats": stats}
+        cur = db.execute(
+            """
+            SELECT streak, beginning, ending FROM streaks WHERE user_id = (?);
+            """,
+            ([user_id]))
+        streak = cur.fetchall()
+        
+        cur = db.execute(
+            """
+            SELECT * FROM wins WHERE user_id = (?);
+            """,
+            ([user_id]))
+        wins = cur.fetchall()
+        
+        return ({"Stats": stats, "Streak": streak, "Wins": wins})
     
     elif shard_key == 1:
         cur = db1.execute(
             """
             SELECT game_id, finished, guesses, won FROM games WHERE user_id = (?);
-            """, ([user_id]))
+            """,
+            ([user_id]))
         stats = cur.fetchall()
         
-        return {"Stats": stats}
+        cur = db1.execute(
+            """
+            SELECT streak, beginning, ending FROM streaks WHERE user_id = (?);
+            """,
+            ([user_id]))
+        streak = cur.fetchall()
+        
+        cur = db1.execute(
+            """
+            SELECT * FROM wins WHERE user_id = (?);
+            """,
+            ([user_id]))
+        wins = cur.fetchall()
+        
+        return {"Stats": stats, "Streak": streak, "Wins": wins}
     
     elif shard_key == 2:
         cur = db2.execute(
             """
             SELECT game_id, finished, guesses, won FROM games WHERE user_id = (?);
-            """, ([user_id]))
+            """,
+            ([user_id]))
         stats = cur.fetchall()
         
-        return {"Stats": stats}
+        cur = db2.execute(
+            """
+            SELECT streak, beginning, ending FROM streaks WHERE user_id = (?);
+            """,
+            ([user_id]))
+        streak = cur.fetchall()
+        
+        cur = db2.execute(
+            """
+            SELECT * FROM wins WHERE user_id = (?);
+            """,
+            ([user_id]))
+        wins = cur.fetchall()
+        
+        return {"Stats": stats, "Streak": streak, "Wins": wins}
 
 # Retrieving the top 10 users by number of wins
 @app.get("/top10wins")
