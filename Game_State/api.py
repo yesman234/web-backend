@@ -41,7 +41,7 @@ def start_a_new_game(new_game: NewGame):
 
 # Updating the state of a game. When a user makes a new guess for a game, record the guess and update the number of guesses remaining. If a user tries to guess more than six times, they should receive an error.
 # Note: you do not need to check whether the guess is valid, if the guess is correct, or report on the placement of the letters in the answer. This functionality was completed in Project 2.
-@app.put('/update/{user_id}')
+@app.put('/update/{user_id}/{guess}')
 def update_state_of_a_game(user_id: str, guess: str):
     
     # get gamestate object based on user_id
