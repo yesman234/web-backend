@@ -46,18 +46,21 @@ def update_state_of_a_game(user_id: str, guess: str):
     
     # get gamestate object based on user_id
     cur_gamestate: GameState = GameState.json_to_GameState(json.loads(r.get(user_id), object_hook=lambda d: SimpleNamespace(**d)))
+    if r.exists(cur_gamestate.user_id):
 
-    # check if they don't have more guesses
-    if not cur_gamestate.eligible_guess():
+        # check if they don't have more guesses
+        if not cur_gamestate.eligible_guess():
+            return HTTPStatus.BAD_REQUEST
+
+        # record the guess
+        cur_gamestate.add_guess(guess)
+
+        # update the number of guesses remaining
+        r.set(cur_gamestate.user_id, json.dumps(cur_gamestate, default=vars))
+
+        return {user_id: json.dumps(cur_gamestate, default=vars)}
+    else:
         return HTTPStatus.BAD_REQUEST
-
-    # record the guess
-    cur_gamestate.add_guess(guess)
-
-    # update the number of guesses remaining
-    r.set(cur_gamestate.user_id, json.dumps(cur_gamestate, default=vars))
-
-    return {user_id: json.dumps(cur_gamestate, default=vars)}
 
 # Restoring the state of a game. Upon request, the user should be able to retrieve an object containing the current state of a game, including the words guessed so far and the number of guesses remaining.
 @app.get('/restore')
