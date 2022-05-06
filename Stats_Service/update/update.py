@@ -1,5 +1,7 @@
-import api
 import sqlite3
+import redis
+
+redisClient = redis.StrictRedis(host="localhost", port=6379, db=0)
 
 db = sqlite3.connect("StatDB_0.db")
 db1 = sqlite3.connect("StatDB_1.db")
@@ -91,11 +93,11 @@ def main():
     wins = updateTop10Wins()
     
     for x in streaks:
-        api.redisClient.zadd("Streaks", {x[0]: x[1]})
+        redisClient.zadd("Streaks", {x[0]: x[1]})
     print("Top 10 Streaks imported")
         
     for y in wins:
-        api.redisClient.zadd("Wins", {y[0]: y[1]})
+        redisClient.zadd("Wins", {y[0]: y[1]})
     print("Top 10 Wins imported")
  
 if __name__ == "__main__":

@@ -1,15 +1,13 @@
 from http import HTTPStatus
 from fastapi import FastAPI, Depends
 from Stats_Service.models import User, Game
+from Stats_Service.update.update import redisClient
 import sqlite3
 import contextlib
 import uuid
-import redis
 
 app = FastAPI()
 
-# Setup redis db
-redisClient = redis.StrictRedis(host="localhost", port=6379, db=0)
 
 def get_db():
     with contextlib.closing(sqlite3.connect("StatDB_0.db")) as db:
