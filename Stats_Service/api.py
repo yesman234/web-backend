@@ -4,10 +4,12 @@ from Stats_Service.models import User, Game
 import sqlite3
 import contextlib
 import uuid
+import redis
 
 app = FastAPI()
 
-
+# Setup redis db
+redisClient = redis.StrictRedis(host="localhost", port=6379, db=0)
 
 def get_db():
     with contextlib.closing(sqlite3.connect("StatDB_0.db")) as db:
@@ -139,83 +141,11 @@ def get_statistics(user_id: str, db: sqlite3.Connection = Depends(get_db),
 
 # Retrieving the top 10 users by number of wins
 @app.get("/top10wins")
-def get_top_10_users_by_wins(db: sqlite3.Connection = Depends(get_db),
-                db1: sqlite3.Connection = Depends(get_db1), db2: sqlite3.Connection = Depends(get_db2)):
-    win_agg = []
-    cur = db.execute(
-        """
-        SELECT * FROM wins LIMIT 10;
-        """
-    )
-    wins = cur.fetchall()
-    for win in wins:
-        win_agg.append(win)
-    wins.clear()
-
-    cur = db1.execute(
-        """
-        SELECT * FROM wins LIMIT 10;
-        """
-    )
-    wins = cur.fetchall()
-    for win in wins:
-        win_agg.append(win)
-    wins.clear()
-
-    cur = db2.execute(
-        """
-        SELECT * FROM wins LIMIT 10;
-        """
-    )
-    wins = cur.fetchall()
-    for win in wins:
-        win_agg.append(win)
-    wins.clear()
-
-    def sort_wins(row):
-        return row["COUNT(won)"]
-    
-    win_agg.sort(reverse=True ,key=sort_wins)
-    return {"Top_10_Wins": win_agg[0:10]}
+def get_top_10_users_by_wins():
+    return {"Top_10_Wins": redisClient.zrange("Wins", 0, -1, withscores=True) }
 
 
 # Retrieving the top 10 users by longest streak
 @ app.get("/top10streak")
-def get_top_10_users_by_longest_streak(db: sqlite3.Connection = Depends(get_db),
-            db1: sqlite3.Connection = Depends(get_db1), db2: sqlite3.Connection = Depends(get_db2)):
-    streak_agg = []
-    cur = db.execute(
-        """
-        SELECT * FROM streaks LIMIT 10;
-        """
-    )
-    wins = cur.fetchall()
-    for win in wins:
-        streak_agg.append(win)
-    wins.clear()
-
-    cur = db1.execute(
-        """
-        SELECT * FROM streaks LIMIT 10;
-        """
-    )
-    wins = cur.fetchall()
-    for win in wins:
-        streak_agg.append(win)
-    wins.clear()
-
-    cur = db2.execute(
-        """
-        SELECT * FROM streaks LIMIT 10;
-        """
-    )
-    wins = cur.fetchall()
-    for win in wins:
-        streak_agg.append(win)
-    wins.clear()
-
-    def sort_streak(row):
-        return row["streak"]
-    
-    streak_agg.sort(reverse=True, key=sort_streak)
-    return {"Top_10_Streaks": streak_agg[0:10]}
+def get_top_10_users_by_longest_streak():
+    return {"Top_10_Streaks": redisClient.zrange("Streaks", 0, -1, withscores=True)}
