@@ -10,8 +10,7 @@ import json
 app = FastAPI()
 
 # Setup redis db
-r = redis.Redis()
-
+r = redis.StrictRedis(host="localhost", port=6379, db=0)
 
 class NewGame(BaseModel):
     user_id: str
