@@ -140,10 +140,10 @@ def get_statistics(user_id: str, db: sqlite3.Connection = Depends(get_db),
 # Retrieving the top 10 users by number of wins
 @app.get("/top10wins")
 def get_top_10_users_by_wins():
-    return {"Top_10_Wins": redisClient.zrange("Wins", 0, -1, withscores=True) }
+    return {"Top_10_Wins": redisClient.zrange("Wins", 0, -1, withscores=True, desc=True) }
 
 
 # Retrieving the top 10 users by longest streak
 @ app.get("/top10streak")
 def get_top_10_users_by_longest_streak():
-    return {"Top_10_Streaks": redisClient.zrange("Streaks", 0, -1, withscores=True)}
+    return {"Top_10_Streaks": redisClient.zrange("Streaks", 0, -1, withscores=True, desc=True)}
