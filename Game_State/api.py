@@ -17,8 +17,6 @@ class NewGame(BaseModel):
     game_id: int
 
 # Starting a new game. The client should supply a user ID and game ID when a game starts. If the user has already played the game, they should receive an error.
-
-
 @app.post('/create')
 def start_a_new_game(new_game: NewGame):
     # User account exists

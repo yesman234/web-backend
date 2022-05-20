@@ -26,3 +26,5 @@ http://localhost:9999/api/v2/docs
 http://localhost:9999/api/v3/docs
 
 http://localhost:9999/api/v4/docs
+
+http://localhost:9999/api/v5/docs

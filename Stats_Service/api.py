@@ -22,6 +22,63 @@ def get_db2():
         db2.row_factory = sqlite3.Row
         yield db2
 
+# Find uuid for username, or generate new uuid if doesn't exist
+@app.get("/user_id/{username}")
+def get_user_id(username: str, db: sqlite3.Connection = Depends(get_db), 
+             db1: sqlite3.Connection = Depends(get_db1), db2: sqlite3.Connection = Depends(get_db2)):
+    # scan through all sharded DBs for username
+    query = """
+        SELECT * FROM users WHERE username = (?);
+    """
+    cur = db.execute(query, ([username]))
+    res = cur.fetchone()
+
+    if res:
+        return {
+            "user_id": res.user_id
+        }
+    
+    cur = db1.execute(query, ([username]))
+    res = cur.fetchone()
+
+    if res:
+        return {
+            "user_id": res.user_id
+        }
+    
+    cur = db2.execute(query, ([username]))
+    res = cur.fetchone()
+
+    if res:
+        return {
+            "user_id": res.user_id
+        }
+    
+    # New user, generate UUID, insert into table
+    new_user_id = str(uuid.uuid4())
+    shard_key = int(uuid.UUID(new_user_id)) % 3
+
+    insert_query = """
+        INSERT INTO users (user_id, username) VALUES (?, ?);
+    """
+
+    if shard_key == 0:
+        db.execute(insert_query, (new_user_id, username,))
+        db.commit()
+        
+
+    elif shard_key == 1:
+        db1.execute(insert_query, (new_user_id, username,))
+        db1.commit()
+
+    elif shard_key == 2:
+        db2.execute(insert_query, (new_user_id, username,))
+        db2.commit()
+    
+    return {
+        "user_id": new_user_id
+    }
+
 # Posting a win or loss for a particular game, along with a timestamp and number of guesses.
 @app.post("/games")
 def add_game(game: Game, db: sqlite3.Connection = Depends(get_db), 
