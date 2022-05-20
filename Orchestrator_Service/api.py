@@ -19,14 +19,22 @@ YEAR = 2022
 def newGame(username: str):
     today_game_id = (datetime.date.today() - datetime.date(YEAR, 1, 1)).days
 
+    resp = httpx.post(STATS_ENDPOINT + "user_id", params={"username": username})
+
+    user_id = json.loads(resp.content.decode('utf-8'))['user_id']
+
     req_body = {
-        'user_id': username,
+        'user_id': user_id,
         'game_id': today_game_id
     }
 
     resp = httpx.post(GAME_STATE_ENDPOINT + "create", data=json.dumps(req_body))
 
-    return resp.status_code
+    return {
+        "status": "new",
+        "user_id": user_id,
+        "game_id": today_game_id
+    }
 
 @app.post("/game/{game_id}")
 def guessWord(user_id: str, guess: str):

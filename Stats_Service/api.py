@@ -5,6 +5,7 @@ from Stats_Service.update.update import redisClient
 import sqlite3
 import contextlib
 import uuid
+import json
 
 app = FastAPI()
 
@@ -23,7 +24,7 @@ def get_db2():
         yield db2
 
 # Find uuid for username, or generate new uuid if doesn't exist
-@app.get("/user_id/{username}")
+@app.post("/user_id")
 def get_user_id(username: str, db: sqlite3.Connection = Depends(get_db), 
              db1: sqlite3.Connection = Depends(get_db1), db2: sqlite3.Connection = Depends(get_db2)):
     # scan through all sharded DBs for username
@@ -35,7 +36,7 @@ def get_user_id(username: str, db: sqlite3.Connection = Depends(get_db),
 
     if res:
         return {
-            "user_id": res.user_id
+            "user_id": res[0]
         }
     
     cur = db1.execute(query, ([username]))
@@ -43,7 +44,7 @@ def get_user_id(username: str, db: sqlite3.Connection = Depends(get_db),
 
     if res:
         return {
-            "user_id": res.user_id
+            "user_id": res[0]
         }
     
     cur = db2.execute(query, ([username]))
@@ -51,7 +52,7 @@ def get_user_id(username: str, db: sqlite3.Connection = Depends(get_db),
 
     if res:
         return {
-            "user_id": res.user_id
+            "user_id": res[0]
         }
     
     # New user, generate UUID, insert into table
