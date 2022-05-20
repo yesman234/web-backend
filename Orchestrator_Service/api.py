@@ -38,13 +38,13 @@ def newGame(username: str):
         "game_id": today_game_id
     }
 
-@app.post("/game")
-def guessWord(game_id: int, user_id: str, guess: str):
-    # TODO: bulk of work likely here
+@app.post("/game/{game_id}")
+def guessWord(user_id: str, guess: str):
+     # TODO: bulk of work likely here
     # 1. verify guess with word validation service
-    resp = httpx.post(VALIDATOR_ENDPOINT + "WordValidations", data=json.dumps({"word": guess}))
-
-    is_valid: bool = bool(json.loads(resp.content.decode('utf-8'))['word_valid'])
+    resp = httpx.post(VALIDATOR_ENDPOINT + "wordValidations", data = json.dump({"word": guess}))
+    
+    is_valid = bool(json.loads(resp.content.decode('utf-8'))['word_valid'])
 
     if not is_valid:
         return HTTPStatus.BAD_REQUEST
