@@ -42,8 +42,9 @@ def newGame(username: str):
 def guessWord(user_id: str, guess: str):
      # TODO: bulk of work likely here
     # 1. verify guess with word validation service
-    resp = httpx.post(VALIDATOR_ENDPOINT + "wordValidations", data = json.dump({"word": guess}))
+    resp = httpx.post(VALIDATOR_ENDPOINT + "WordValidations", data=json.dumps({"word": guess}))
     
+
     is_valid = bool(json.loads(resp.content.decode('utf-8'))['word_valid'])
 
     if not is_valid:
@@ -52,11 +53,7 @@ def guessWord(user_id: str, guess: str):
     # 2. check that user has guesses remaining (get game state)
     resp = httpx.get(GAME_STATE_ENDPOINT + 'restore/' + user_id)
 
-    print(json.loads(json.loads(resp.content.decode('utf-8'))['user_id']))
-
     cur_game_state = GameState.GameState.httpx_to_GameState(json.loads(json.loads(resp.content.decode('utf-8'))['user_id']))
-
-    print(cur_game_state)
 
     if cur_game_state.guesses_remaining() == 5:
         return HTTPStatus.BAD_REQUEST
