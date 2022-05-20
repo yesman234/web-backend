@@ -38,8 +38,14 @@ def newGame(username: str):
 
 @app.post("/game/{game_id}")
 def guessWord(user_id: str, guess: str):
-    # TODO: bulk of work likely here
+     # TODO: bulk of work likely here
     # 1. verify guess with word validation service
+    resp = httpx.post(VALIDATOR_ENDPOINT + "wordValidations", data = json.dump({"guess": guess}))
+    
+        is_Valid = bool(json.loads(resp.content.decode('utf-8'))['user_id'])
+
+        if not is_Valid:
+            return HTTPStatus.BAD_REQUEST
 
     # 2. check that user has guesses remaining (get game state)
     # if 1 and 2 are true
