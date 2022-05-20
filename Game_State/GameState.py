@@ -19,3 +19,6 @@ class GameState:
     
     def json_to_GameState(json_obj: SimpleNamespace):
         return GameState(json_obj.user_id, json_obj.game_id, json_obj.prev_game_ids, json_obj.guesses)
+    
+    def httpx_to_GameState(json_obj):
+        return GameState(json_obj['user_id'], json_obj['game_id'], json_obj['prev_game_ids'], json_obj['guesses'])

@@ -1,9 +1,11 @@
 from datetime import datetime
+from http import HTTPStatus
+import httpx
+import datetime
 import json
 from fastapi import FastAPI, Response, HTTPException, status
 from pydantic import BaseModel
-import httpx
-import datetime
+from root import GameState
 
 app = FastAPI()
 
@@ -36,12 +38,29 @@ def newGame(username: str):
         "game_id": today_game_id
     }
 
-@app.post("/game/{game_id}")
-def guessWord(user_id: str, guess: str):
+@app.post("/game")
+def guessWord(game_id: int, user_id: str, guess: str):
     # TODO: bulk of work likely here
     # 1. verify guess with word validation service
+    resp = httpx.post(VALIDATOR_ENDPOINT + "WordValidations", data=json.dumps({"word": guess}))
+
+    is_valid: bool = bool(json.loads(resp.content.decode('utf-8'))['word_valid'])
+
+    if not is_valid:
+        return HTTPStatus.BAD_REQUEST
 
     # 2. check that user has guesses remaining (get game state)
+    resp = httpx.get(GAME_STATE_ENDPOINT + 'restore/' + user_id)
+
+    print(json.loads(json.loads(resp.content.decode('utf-8'))['user_id']))
+
+    cur_game_state = GameState.GameState.httpx_to_GameState(json.loads(json.loads(resp.content.decode('utf-8'))['user_id']))
+
+    print(cur_game_state)
+
+    if cur_game_state.guesses_remaining() == 5:
+        return HTTPStatus.BAD_REQUEST
+
     # if 1 and 2 are true
     # 3. Record the guess and update number of guesses remaining
     # 4. Check to see if guess correct

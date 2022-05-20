@@ -74,6 +74,6 @@ def restore_state_of_a_game(user_id: str):
         cur_gamestate: GameState = GameState.json_to_GameState(
             json.loads(r.get(user_id), object_hook=lambda d: SimpleNamespace(**d)))
 
-        return {user_id: json.dumps(cur_gamestate, default=vars)}
+        return {"user_id": json.dumps(cur_gamestate, default=vars)}
     else:
         return HTTPStatus.UNPROCESSABLE_ENTITY
