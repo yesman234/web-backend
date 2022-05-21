@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from http import HTTPStatus
 import httpx
 import datetime
@@ -61,7 +61,12 @@ def guessWord(user_id: str, guess: str):
     # if 1 and 2 are true
     # 3. Record the guess and update number of guesses remaining
     # 4. Check to see if guess correct
+    resp = httpx.post(ANSWER_ENDPOINT + 'check', data=json.dumps({"word": guess, "timestamp": str(datetime.datetime.now().timestamp())}))
 
+    letter_check = json.loads(resp.content.decode('utf-8'))
+
+    for letter in letter_check:
+        print(letter)
     # if guess correct
         # record the win
         # return the user's score
