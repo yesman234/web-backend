@@ -60,7 +60,7 @@ def update_state_of_a_game(user_id: str, guess: str):
         # update the number of guesses remaining
         r.set(cur_gamestate.user_id, json.dumps(cur_gamestate, default=vars))
 
-        return {user_id: json.dumps(cur_gamestate, default=vars)}
+        return {'user_id': json.dumps(cur_gamestate, default=vars)}
     else:
         return HTTPStatus.BAD_REQUEST
 

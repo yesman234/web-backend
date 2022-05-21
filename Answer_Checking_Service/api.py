@@ -16,6 +16,7 @@ def check_guess(guess: Word, status_code=status.HTTP_200_OK):
         raise HTTPException(status_code=404, detail="Word not found")
 
     rowid, answer, date = word_of_day_record[0]
+    print (answer)
     result = []
     for guess_letter, answer_letter in zip(guess.word, answer):
         if guess_letter == answer_letter:

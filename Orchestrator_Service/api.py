@@ -1,3 +1,4 @@
+from curses import curs_set
 from datetime import date, datetime
 from http import HTTPStatus
 import httpx
@@ -5,6 +6,7 @@ import datetime
 import json
 from fastapi import FastAPI, Response, HTTPException, status
 from pydantic import BaseModel
+import Game_State
 from root import GameState
 
 app = FastAPI()
@@ -38,7 +40,7 @@ def newGame(username: str):
         "game_id": today_game_id
     }
 
-@app.post("/game/{game_id}")
+@app.post("/game")
 def guessWord(user_id: str, guess: str):
      # TODO: bulk of work likely here
     # 1. verify guess with word validation service
@@ -55,7 +57,7 @@ def guessWord(user_id: str, guess: str):
 
     cur_game_state = GameState.GameState.httpx_to_GameState(json.loads(json.loads(resp.content.decode('utf-8'))['user_id']))
 
-    if cur_game_state.guesses_remaining() == 5:
+    if cur_game_state.guesses_remaining() == 0:
         return HTTPStatus.BAD_REQUEST
 
     # if 1 and 2 are true
@@ -65,18 +67,44 @@ def guessWord(user_id: str, guess: str):
 
     letter_check = json.loads(resp.content.decode('utf-8'))
 
+    game_win = True
     for letter in letter_check:
-        print(letter)
-    # if guess correct
-        # record the win
-        # return the user's score
+        if letter != 'green':
+            game_win = False
+            break
     
-    # if guess is incorrect and no guesses remain
-        # record the loss
-        # return the user's score
-    
-    # if guess is incorrect and additional guesses remain
-        # return which letters are included in the word
-        # and which are correctly placed
+    # update game state
+    resp = httpx.put(GAME_STATE_ENDPOINT + 'update/' + user_id + '/' + guess)
+    cur_game_state = GameState.GameState.httpx_to_GameState(json.loads(json.loads(resp.content.decode('utf-8'))['user_id']))
 
-    return status.HTTP_200_OK
+    print("Guess Remaining:" + str(cur_game_state.guesses_remaining()))
+    
+    if game_win or cur_game_state.guesses_remaining() == 0:
+        httpx.post(STATS_ENDPOINT + 'games', data=json.dumps({
+            "user_id": cur_game_state.user_id,
+            "game_id": cur_game_state.game_id,
+            "finished": str(datetime.datetime.now().timestamp()),
+            "guesses": cur_game_state.guesses,
+            "won": game_win
+        }))
+
+        resp = httpx.get(STATS_ENDPOINT + 'games/' + cur_game_state.user_id)
+
+        return json.loads(resp.content.decode('utf-8'))
+    
+    correct = []
+    present = []
+    for i in range(len(letter_check)):
+        if letter_check[i] == 'green':
+            correct.append(guess[i])
+        elif letter_check[i] == 'yellow':
+            present.append(guess[i])
+
+    return {
+        "remaining": cur_game_state.guesses_remaining(),
+        "status": "incorrect",
+        "letters": {
+            "correct": correct,
+            "present": present
+        }
+    }
