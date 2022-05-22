@@ -3,6 +3,7 @@
 # Members
 
 Dan Lungaro dlungaro@csu.fullerton.edu
+Marcellus Jones mdjonesonly@csu.fullteron.edu
 
 
 # How to initialize the program
